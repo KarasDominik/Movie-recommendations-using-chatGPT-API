@@ -1,6 +1,5 @@
 import os
 import openai
-import re
 
 openai.api_key = "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"
 
@@ -32,10 +31,8 @@ def show_dict():
     print(users)
 
 
-def create_recommendations(category):
+def create_movie_recommendations(category):
     prompt = "Give Recommendations of " + category + " movies from 2021"
-    #openai.api_key = "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"
-
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
@@ -49,8 +46,21 @@ def create_recommendations(category):
     print(response.choices[0].text)
 
 
+def create_book_recommendations(category):
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt="Give Recommendations of " + category + " books:",
+        temperature=0.5,
+        max_tokens=200,
+        top_p=1.0,
+        frequency_penalty=0.52,
+        presence_penalty=0.5,
+        stop=["11."]
+    )
+    print(response.choices[0].text)
+
+
 def tweet_classifier(tweet):
-    #openai.api_key = "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"
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt="Decide whether a Tweet's sentiment is positive, neutral, or negative.\n\nTweet: " + tweet,
@@ -67,8 +77,8 @@ while True:
     print("==MENU==")
     print("1. Add user")
     print("2. Insert rating")
-    print("3. Create recommendations")
-    print("4. Show dictionary")
+    print("3. Create movie recommendations")
+    print("4. Create book recommendations")
     print("5. Tweet classifier")
     print("6. Exit")
     choice = int(input("Your choice: "))
@@ -79,9 +89,11 @@ while True:
     if choice == 3:
         id = ask_for_id()
         category = genres[users[id].index(max(users[id]))]
-        create_recommendations(category)
+        create_movie_recommendations(category)
     if choice == 4:
-        show_dict()
+        id = ask_for_id()
+        category = genres[users[id].index(max(users[id]))]
+        create_book_recommendations(category)
     if choice == 5:
         tweet = input("Tweet: ")
         tweet_classifier(tweet)
