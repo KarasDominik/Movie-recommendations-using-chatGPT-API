@@ -1,13 +1,15 @@
 import os
 import openai
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 users = {}
 genres = ["Action", "Adventure", "Comedy", "Drama", "Horror", "Mystery", "Romance"]
 
 
-def find_categories(id, max_rating):
+def find_categories():
+    id = ask_for_id()
+    max_rating = max(users[id])
     categories = []
     for i in range(len(users[id])):
         if users[id][i] == max_rating:
@@ -39,7 +41,7 @@ def show_dict():
     print(users)
 
 
-def create_movie_recommendations(categories):
+def create_movies_recommendations(categories):
     prompt = "Give Recommendations of " + categories + " movies from 2021"
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -51,10 +53,10 @@ def create_movie_recommendations(categories):
         presence_penalty=0.6,
         stop=[" Human:", " AI:"]
     )
-    print(response.choices[0].text)
+    return response.choices[0].text
 
 
-def create_book_recommendations(categories):
+def create_books_recommendations(categories):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt="Give Recommendations of " + categories + " books:",
@@ -65,7 +67,7 @@ def create_book_recommendations(categories):
         presence_penalty=0.5,
         stop=["11."]
     )
-    print(response.choices[0].text)
+    return response.choices[0].text
 
 
 def tweet_classifier(tweet):
@@ -82,6 +84,7 @@ def tweet_classifier(tweet):
 
 
 while True:
+    print()
     print("==MENU==")
     print("1. Add user")
     print("2. Insert rating")
@@ -95,13 +98,13 @@ while True:
     if choice == 2:
         insert_rating(ask_for_id())
     if choice == 3:
-        id = ask_for_id()
-        max_rating = max(users[id])
-        create_movie_recommendations(find_categories(id, max_rating))
+        categories = find_categories()
+        print("Movies recommendations for categories: " + categories)
+        print(create_movies_recommendations(categories))
     if choice == 4:
-        id = ask_for_id()
-        max_rating = max(users[id])
-        create_book_recommendations(find_categories(id, max_rating))
+        categories = find_categories()
+        print("Books recommendations for categories: " + categories)
+        print(create_books_recommendations(categories))
     if choice == 5:
         tweet = input("Tweet: ")
         tweet_classifier(tweet)
